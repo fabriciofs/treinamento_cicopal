@@ -1,38 +1,37 @@
 <template>
 <div>
-  <input type="text" v-model="textoPesquisa">
-  <div v-if="elementosFiltrados.length === 0">
-    <span>Nao ha elementos</span>
-  </div>
-  <div v-else-if="elementosFiltrados.length === 1">
-    <span>So tem 1 nao vou nem mostrar</span>
-  </div>  
-    <div v-else-if="elementosFiltrados.length === 2">
-    <span>So tem 2 nao vou nem mostrar</span>
-  </div> 
-  <table v-else>
-    <th v-for="(coluna) in colunas" :key="coluna.campo">
-      <td>{{coluna.texto}}</td>
-    </th>
-    <tr v-for="(elemento) in elementosFiltrados" :key="elemento.cpf" >
-      <td v-for="(coluna,indexColuna) in colunas" :key="indexColuna">{{elemento[coluna.campo]}}</td>
-    </tr>
-  </table>
+  <Pesquisa 
+    :elementosFiltrados="elementosFiltrados"
+    @pesquisou="pesquisaRealisada"
+  />
+  <Tabela titulo="Url e Nome" :dados="elementosFiltrados" :colunas="colunas1"/>
+  <Tabela :dados="elementosFiltrados" :colunas="colunas2"/>
  </div>
 </template>
 
 <script>
+import axios from 'axios'
+
+import Pesquisa from './components/Pesquisa'
+import Tabela from './components/Tabela'
+
 export default {
+  components: {
+    Pesquisa,
+    Tabela
+  },
   data() {
     return {
       textoPesquisa: '',
       elementos: [],
-      colunas: [
-        {campo: 'cpf', texto: 'CPF'},
-        {campo: 'nome', texto: 'Nome'},
-        {campo: 'idade', texto: 'Idade'},
-        {campo: 'sexo', texto: 'Sexo'},
-      ]
+      colunas1: [
+        {campo: 'url', texto: 'url'},
+        {campo: 'name', texto: 'Nome'},
+      ],
+      colunas2: [
+        {campo: 'name', texto: 'Nome'},
+        {campo: 'birth_year', texto: 'Idade'},
+      ]      
     }
   },
   computed: {
@@ -41,23 +40,53 @@ export default {
       //   return []
       // }
       return this.elementos
-        .filter((elemento)=>elemento.nome.toUpperCase().includes(this.textoPesquisa.toUpperCase()))
+        .filter((elemento)=>elemento.name.toUpperCase().includes(this.textoPesquisa.toUpperCase()))
     }
   },
-  created() {
-    setTimeout(()=>{
-    this.elementos = [
-        {cpf:'1', nome: 'Fabricio Ferreira Santos', idade: 20, sexo: 'Masculino'},
-        {cpf:'2', nome: 'Felipe Moreira', idade: 42, sexo: 'Masculino'},
-        {cpf:'3', nome: 'Wexley Ribeiro', idade: 35, sexo: 'Masculino'},
-        {cpf:'4', nome: 'Domingos Graccho', idade: 22, sexo: 'Masculino'},
-        {cpf:'5', nome: 'Julia Ferreira', idade: 11, sexo: 'Feminino'},
-        {cpf:'6', nome: 'Joao da Silva', idade: 55, sexo: 'Feminino'},
-        {cpf:'7', nome: 'Maria da Silva', idade: 45, sexo: 'Feminino'},
-        {cpf:'8', nome: 'Maria da Silva', idade: 45, sexo: 'Feminino'},
-        {cpf:'9', nome: 'Maria da Silva', idade: 45, sexo: 'Feminino'},
-      ]
-  }, 3000)
+  methods: {
+    pesquisaRealisada(textoPesquisa) {
+      this.textoPesquisa = textoPesquisa
+    }
+  },
+  async created() {
+    // console.log('antes');
+    // axios.get("https://swapi.dev/api/people/")
+    //   .then((response)=>{
+    //     console.log('dentro', response.data.results);
+    //     return response.data.results.map((elemento)=>{
+    //       return {
+    //         url: elemento.url,
+    //         name: elemento.name,
+    //         birth_year: elemento.birth_year,
+    //         skin_color: elemento.skin_color
+    //       }
+    //     })
+    //   })
+    //   .then((elementos)=>{
+    //     this.elementos = elementos
+    //   })
+    //   .catch((error)=>{
+    //     console.log('deu erro');
+    //     console.error(error.message)
+    //   })
+    // console.log('depois');
+
+    try {
+      // console.log('antes')
+      const response = await axios.get("https://swapi.dev/api/people/")
+      // console.log('depois', response);
+      this.elementos =response.data.results.map((elemento)=>{
+            return {
+              url: elemento.url,
+              name: elemento.name,
+              birth_year: elemento.birth_year,
+              skin_color: elemento.skin_color
+            }
+          })
+      
+    } catch (error) {
+      alert("erro ona api aguarde alguns instantes")
+    }
 
   },
 }

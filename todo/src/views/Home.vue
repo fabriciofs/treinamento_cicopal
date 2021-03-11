@@ -1,9 +1,14 @@
 <template>
   <div>
-    <h1>Home</h1>
+    <Todo />
   </div>
 </template>
 
 <script>
-export default {};
+import Todo from "../components/Todo";
+export default {
+  components: {
+    Todo,
+  },
+};
 </script>

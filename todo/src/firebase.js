@@ -13,4 +13,18 @@ const firebaseConfig = {
 
 const firebaseApp = firebase.initializeApp(firebaseConfig);
 
+firebase.firestore().settings({
+  cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED,
+});
+
+firebase
+  .firestore()
+  .enablePersistence()
+  .then(() => {
+    console.log("Persistencia habilitada com sucesso");
+  })
+  .catch((error) => {
+    console.error("Erro na habilitacao da persistencia", error.message);
+  });
+
 export default firebaseApp;
